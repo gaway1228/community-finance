@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>黎明京都12 社區財報 115年</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1d2330;--mut:#6b7280;--in:#2a9d6f;--out:#d9534f;--bl:#2f6fdb;--bd:#e4e7ec;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13161c;--card:#1d222b;--tx:#e8ebf1;--mut:#98a1b0;--in:#4fc593;--out:#f07b77;--bl:#6a9cf5;--bd:#2d3440}}
+:root[data-theme="dark"]{--bg:#13161c;--card:#1d222b;--tx:#e8ebf1;--mut:#98a1b0;--in:#4fc593;--out:#f07b77;--bl:#6a9cf5;--bd:#2d3440}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0}
+h2{font-size:16px;margin:0 0 10px}
+.sub{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.k{font-size:12px;color:var(--mut)}
+.v{font-size:20px;font-weight:700}
+.in{color:var(--in)}.out{color:var(--out)}
+.note{font-size:13px;color:var(--mut);margin:8px 0 0}
+.scroll{overflow-x:auto}
+svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 4px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--mut);font-weight:600}
+details{border-top:1px solid var(--bd);padding:8px 0}
+details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+summary span:last-child{color:var(--mut);font-weight:400;font-size:13px}
+.row{display:flex;justify-content:space-between;font-size:14px;padding:3px 0;gap:10px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;background:var(--bl)}
+.notice{border-left:4px solid var(--bl)}.notice p{margin:8px 0;font-size:14px}
+ul{padding-left:18px;margin:6px 0;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>黎明京都12公寓大廈 115年財報總覽</h1>
+<div class="sub" id="asof"></div>
+
+<div class="card"><div class="grid" id="kpi"></div></div>
+
+<div class="card notice"><h2>📢 管委會財務公告</h2>
+<p>所有支出均需經由委員會集體討論同意，並依正規請款流程辦理。</p></div>
+
+<div class="card"><h2>每月結餘走勢</h2><div id="c1"></div></div>
+<div class="card"><h2>每月收入 vs 支出</h2><div id="c2"></div>
+<div class="note"><span class="in">■</span> 收入　<span class="out">■</span> 支出</div></div>
+
+<div class="card"><h2>重點觀察</h2><ul id="insights"></ul></div>
+
+<div class="card"><h2>月度收支表</h2><div class="scroll"><table id="tbl"></table></div></div>
+
+<div class="card"><h2>每月明細（點開查看）</h2><div id="detail"></div></div>
+
+<div class="card"><h2>管理費收繳進度</h2><div id="coll"></div></div>
+
+<div class="card"><h2>資金存放</h2><div id="fund"></div></div>
+
+<p class="sub">資料來源：管委會每月公告之收支月報表。金額單位：新台幣元。</p>
+</main>
+<script>
+// ===== 每月更新：只要在 M 陣列最後新增一筆 =====
+const M=[
+{m:1,open:667119,inc:179871,exp:52707,close:794283,
+ i:[["管理費收入",143871],["B3-3F暫收款",36000]],
+ e:[["清潔員服務費",15750],["購買委員會信箱",651],["ET指示貼牌",132],["清潔用品",174],["B3-3F匯錯款退回",36000]]},
+{m:2,open:794283,inc:2000,exp:19238,close:777045,
+ i:[["消防設備異常查修（住戶裝修）",2000]],
+ e:[["清潔員服務費",15750],["消防設備異常查修",2000],["廣播主機及信箱配鎖頭",350],["清潔用品",1138]]},
+{m:3,open:777045,inc:94304,exp:50000,close:821349,
+ i:[["管理費收入（4-6月）",94304]],
+ e:[["清潔員服務費",15750],["消防火警總機及廣播主機電池更換",2750],["31號車位上方玻璃破損更換",4500],["機車停車位上方白鐵水景",27000]]},
+{m:4,open:821349,inc:50063,exp:15859,close:855553,
+ i:[["管理費收入（4-6月）",49563],["機車清潔費",500]],
+ e:[["清潔員服務費",15750],["清潔用品",109]]},
+{m:5,open:855553,inc:0,exp:15923,close:839630,
+ i:[],
+ e:[["清潔員服務費",15750],["影印費（區分會議通知單等）",173]]},
+{m:6,open:839630,inc:2876,exp:18186,close:824320,
+ i:[["活存利息",2876]],
+ e:[["清潔員服務費",15750],["影印費",786],["清潔用品",1650]]},
+{m:7,open:824320,inc:182770,exp:47025,close:960065,
+ i:[["管理費收入（7-9月）",182770]],
+ e:[["安心居管理服務費（總幹事+清潔員）",42000],["消防火警鑑報查看",525],["更換15號停車位上方消防探測器",1764],["購買公告欄",1060],["警示膠帶",216],["清潔用品",660],["銀行印鑑變更手續費",100],["刻印章",500],["配電機房鑰匙",200]]},
+{m:8,open:960065,inc:9048,exp:58550,close:910563,
+ i:[["管理費收入（7-9月）",9048]],
+ e:[["安心居管理服務費",42000],["增設大門、鐵門繼電器",5350],["清洗自來水上水塔及下水池（8只）",11200]]},
+{m:9,open:910563,inc:4800,exp:111050,close:804313,
+ i:[["機車清潔費",4800]],
+ e:[["安心居管理服務費",42000],["電梯保養費（115.9.1–116.8.31 一年）",55200],["購買置物鐵櫃（放置電信機房）",4725],["中庭花樹修剪及除草、噴除蟲藥",7000],["銀行印鑑變更手續費",100],["各棟一樓大門下方加裝連條",1425],["中元節普渡拜拜",600]]},
+{m:10,open:804313,inc:191818,exp:73175,close:922956,
+ i:[["管理費收入（10-12月）",191818]],
+ e:[["安心居管理服務費",42000],["消防改善（一樓消防定址偵煙改定址差動探測器）",18711],["彩色公告護貝",165],["7之2號3樓之2電表箱玻璃破裂更新",700],["清潔用品",1499],["購買腳踏式資源回收桶及大型折疊清潔車",7700],["購買一樓告示牌",2400]]}
+];
+const COLL=[["第一季（1–3月）",143866,143865,"住戶少繳1元"],["第二季（4–6月）",143866,143867,"住戶補繳1元"],["第三季（7–9月）",191818,191818,"已全部繳清"],["第四季（10–12月）",191818,191818,"已全部繳清"]];
+const FUND={date:"10/16",pub:516033,mgmt:480098,pending:73175,note:"第三季起管理費由 30元/坪 調整為 40元/坪"};
+// ============================================================
+const f=n=>n.toLocaleString("en-US"),$=id=>document.getElementById(id);
+const last=M[M.length-1];
+$("asof").textContent="截至115年"+last.m+"月 · 每月更新";
+const totIn=M.reduce((s,x)=>s+x.inc,0),totEx=M.reduce((s,x)=>s+x.exp,0);
+$("kpi").innerHTML=[["目前結餘（扣除待付款）",f(last.close),""],["年初結餘",f(M[0].open),""],["累計收入",f(totIn),"in"],["累計支出",f(totEx),"out"]]
+.map(a=>`<div><div class="k">${a[0]}</div><div class="v ${a[2]}">${a[1]}</div></div>`).join("");
+
+// line chart
+(function(){const W=640,H=220,p={l:52,r:12,t:12,b:26};const v=M.map(x=>x.close);
+const lo=Math.floor(Math.min(...v)/50000)*50000-50000,hi=Math.ceil(Math.max(...v)/50000)*50000;
+const X=i=>p.l+i*(W-p.l-p.r)/Math.max(M.length-1,1),Y=y=>p.t+(hi-y)*(H-p.t-p.b)/(hi-lo);
+let s=`<svg viewBox="0 0 ${W} ${H}">`;
+for(let y=lo;y<=hi;y+=50000)s+=`<line x1="${p.l}" x2="${W-p.r}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--bd)"/><text x="${p.l-6}" y="${Y(y)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${y/10000}萬</text>`;
+s+=`<polyline fill="none" stroke="var(--bl)" stroke-width="2.5" points="${v.map((y,i)=>X(i)+","+Y(y)).join(" ")}"/>`;
+v.forEach((y,i)=>{s+=`<circle cx="${X(i)}" cy="${Y(y)}" r="3.5" fill="var(--bl)"/><text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--mut)">${M[i].m}月</text>`});
+$("c1").innerHTML=s+"</svg>"})();
+
+// bar chart
+(function(){const W=640,H=230,p={l:52,r:8,t:12,b:26};
+const mx=Math.ceil(Math.max(...M.map(x=>Math.max(x.inc,x.exp)))/50000)*50000;
+const Y=y=>p.t+(mx-y)*(H-p.t-p.b)/mx,gw=(W-p.l-p.r)/M.length,bw=gw*0.32;
+let s=`<svg viewBox="0 0 ${W} ${H}">`;
+for(let y=0;y<=mx;y+=50000)s+=`<line x1="${p.l}" x2="${W-p.r}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--bd)"/><text x="${p.l-6}" y="${Y(y)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${y/10000}萬</text>`;
+M.forEach((x,i)=>{const c=p.l+i*gw+gw/2;
+s+=`<rect x="${c-bw-1}" y="${Y(x.inc)}" width="${bw}" height="${Y(0)-Y(x.inc)}" fill="var(--in)" rx="2"/><rect x="${c+1}" y="${Y(x.exp)}" width="${bw}" height="${Y(0)-Y(x.exp)}" fill="var(--out)" rx="2"/><text x="${c}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--mut)">${x.m}月</text>`});
+$("c2").innerHTML=s+"</svg>"})();
+
+// insights
+const ins=[];
+const early=M.filter(x=>x.m<=6&&x.m!==3),svc=M.filter(x=>x.m>=7);
+ins.push("1–6月清潔員費用每月 15,750 元；總幹事費用由建設公司支付。7月起改由安心居提供「機動總幹事＋清潔員」，每月 42,000 元。");
+ins.push("管理費自第三季（7月）起由 30元/坪 調為 40元/坪，每季應收由 143,866 增為 191,818 元。");
+const big=[...M].sort((a,b)=>b.exp-a.exp)[0];
+ins.push(`單月支出最高為${big.m}月（${f(big.exp)}元），主因是${big.e.slice().sort((a,b)=>b[1]-a[1])[0][0]}（${f(big.e.slice().sort((a,b)=>b[1]-a[1])[0][1])}元）。`);
+ins.push(`今年累計收入 ${f(totIn)} 元、支出 ${f(totEx)} 元，結餘較年初${last.close>=M[0].open?"增加":"減少"} ${f(Math.abs(last.close-M[0].open))} 元。`);
+ins.push("管理費通常在每季第一個月收齊，所以結餘會在1、3、7、10月明顯上升，其餘月份因支出而緩降。");
+$("insights").innerHTML=ins.map(t=>`<li>${t}</li>`).join("");
+
+// table
+$("tbl").innerHTML="<tr><th>月份</th><th>收入</th><th>支出</th><th>月底結餘</th></tr>"+M.map(x=>`<tr><td>${x.m}月</td><td class="in">${x.inc?f(x.inc):"–"}</td><td class="out">${f(x.exp)}</td><td><b>${f(x.close)}</b></td></tr>`).join("")+`<tr><td><b>合計</b></td><td class="in"><b>${f(totIn)}</b></td><td class="out"><b>${f(totEx)}</b></td><td></td></tr>`;
+
+// detail
+$("detail").innerHTML=[...M].reverse().map(x=>`<details><summary><span>${x.m}月</span><span>收 ${f(x.inc)}／支 ${f(x.exp)}</span></summary>
+${x.i.map(r=>`<div class="row"><span>＋ ${r[0]}</span><span class="in">${f(r[1])}</span></div>`).join("")}
+${x.e.map(r=>`<div class="row"><span>－ ${r[0]}</span><span class="out">${f(r[1])}</span></div>`).join("")}</details>`).join("");
+
+// collection
+const cT=COLL.reduce((s,c)=>s+c[1],0),cR=COLL.reduce((s,c)=>s+c[2],0);
+$("coll").innerHTML=COLL.map(c=>`<div class="row"><b>${c[0]}</b><span>${f(c[2])} / ${f(c[1])}</span></div><div class="bar"><i style="width:${Math.min(100,c[2]/c[1]*100)}%"></i></div><div class="note" style="margin:-6px 0 8px">${c[3]}</div>`).join("")+`<div class="row"><b>全年</b><span>${f(cR)} / ${f(cT)}（${(cR/cT*100).toFixed(1)}%）</span></div><div class="note">${FUND.note}</div>`;
+
+// fund
+$("fund").innerHTML=`<div class="row"><span>公共基金（重大修繕用）</span><span>${f(FUND.pub)}</span></div><div class="row"><span>管理費相關收入</span><span>${f(FUND.mgmt)}</span></div><div class="row"><span>減：待付廠商款項</span><span class="out">－${f(FUND.pending)}</span></div><div class="row"><b>實際結餘</b><b>${f(FUND.pub+FUND.mgmt-FUND.pending)}</b></div><div class="note">合作金庫北羅東分行，存摺最後交易日 ${FUND.date}。</div>`;
+</script>
+</body>
+</html>
